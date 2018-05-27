@@ -22,17 +22,6 @@ class CheckTime():
         self.time_12am = datetime.time(0, 0)
 
 
-    def print_self(self):
-        """
-        テスト用
-        """
-        print(self.time_a)
-        print(self.time_b)
-        print(self.time_c)
-        print(self.time_d)
-        print(self.time_e)
-
-
     def info(self, weekday):
         """
         infoコマンドの返信を生成
@@ -81,7 +70,8 @@ class CheckTime():
         poptime = self.json_data["time"][time_key]
         bossname = self.json_data[str(weekday)][time_key]
 
-        nowplay = "{0} {1}".format(poptime, bossname)
+        nowplay = "{0} {1}　　　　　　　　　　　　　　　　　　　　."\
+        .format(poptime, bossname)
 
         return nowplay
 
