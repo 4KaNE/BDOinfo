@@ -38,8 +38,9 @@ class CheckTime():
 
     def check_before30(self, now, time_key, weekday):
         """
-        現在時刻が30分前かどうかを調べる
+        現在時刻が30分前、10分前かどうかを調べる
         30分前じゃなかったらres = Noneで返信無し
+        ボス名Noneは無視
         """
         timedict = self.json_data["time"]
         poptime = datetime.time(int(timedict[time_key].split(":")[0]), \
@@ -49,16 +50,20 @@ class CheckTime():
         after10min = now + datetime.timedelta(minutes=10)
         time_after10 = datetime.time(after10min.hour, after10min.minute)
 
-        if poptime == time_after30:
-            res = "30分後に{}がわくよ！準備は良い？"\
-            .format(self.json_data[str(weekday)][time_key])
-
-        elif poptime == time_after10:
-            res = "10分後に{}がわくよ！準備は良い？"\
-            .format(self.json_data[str(weekday)][time_key])
+        if self.json_data[str(weekday)][time_key] == "None":
+            res = None
 
         else:
-            res = None
+            if poptime == time_after30:
+                res = "30分後に{}がわくよ！準備は良い？"\
+                .format(self.json_data[str(weekday)][time_key])
+
+            elif poptime == time_after10:
+                res = "10分後に{}がわくよ！準備は良い？"\
+                .format(self.json_data[str(weekday)][time_key])
+
+            else:
+                res = None
 
         return res
 
