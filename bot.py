@@ -20,7 +20,6 @@ POPTIME_JSON = open('poptime.json', 'r', encoding="utf-8_sig")
 JSON_DATA = json.load(POPTIME_JSON)
 CT = time_checker.CheckTime(JSON_DATA)
 
-
 @CLIENT.event
 async def regular_processing():
     """
@@ -53,7 +52,6 @@ async def on_ready():
     print('Logged in as')
     print(CLIENT.user.name)
     print(CLIENT.user.id)
-    CLIENT.loop.create_task(regular_processing())
 
 
 @CLIENT.event
@@ -141,5 +139,5 @@ async def check_reaction(target_msg, weekday):
                 await CLIENT.remove_reaction(target_msg, \
                 target_reaction.reaction.emoji, target_reaction.user)
 
-
+CLIENT.loop.create_task(regular_processing())
 CLIENT.run(BOT_TOKEN)
