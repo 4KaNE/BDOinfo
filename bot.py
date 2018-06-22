@@ -1,5 +1,5 @@
 """This is a main program"""
-import asyncio
+from asyncio import sleep
 import configparser
 import datetime
 import json
@@ -37,10 +37,15 @@ async def regular_processing():
         res = CT.check_before30(now, time_key, weekday)
         if res is None:
             print("...")
-        else:
-            await CLIENT.send_message(CHANNEL, res)
 
-        await asyncio.sleep(60)
+        else:
+            try:
+                msg = await CLIENT.send_message(CHANNEL, res)
+                CLIENT.loop.create_task(del_notification(msg))
+            except AttributeError:
+                pass
+
+        await sleep(60)
 
 
 @CLIENT.event
@@ -71,9 +76,9 @@ async def on_message(message):
             msg = await CLIENT.send_message(CHANNEL, embed=res)
             await CLIENT.add_reaction(msg, '◀')
             await CLIENT.add_reaction(msg, '▶')
-            await asyncio.sleep(1)
+            await sleep(1)
             CLIENT.loop.create_task(check_reaction(msg, weekday))
-            await asyncio.sleep(DEL_TIME)
+            await sleep(DEL_TIME)
             await CLIENT.delete_message(msg)
             await CLIENT.delete_message(message)
 
@@ -86,7 +91,7 @@ async def on_message(message):
             \n要望、バグ報告は https://github.com/4KaNE/BDOinfo に"\
             .format(COMAND_PREFIX), colour=0x3498db)
             msg = await CLIENT.send_message(CHANNEL, embed=res)
-            await asyncio.sleep(DEL_TIME)
+            await sleep(DEL_TIME)
             await CLIENT.delete_message(msg)
             await CLIENT.delete_message(message)
 
@@ -138,6 +143,22 @@ async def check_reaction(target_msg, weekday):
                 await CLIENT.edit_message(target_msg, embed=msg)
                 await CLIENT.remove_reaction(target_msg, \
                 target_reaction.reaction.emoji, target_reaction.user)
+
+@CLIENT.event
+async def del_notification(target_msg):
+    """
+    ボス時間の通知を20分後に削除する
+    """
+    await sleep(1200)
+    count = 0
+    while count < 5:
+        count += 1
+        try:
+            await CLIENT.delete_message(target_msg)
+        except AttributeError:
+            print("通知の削除に失敗 {}回目".format(count))
+
+        sleep(60)
 
 CLIENT.loop.create_task(regular_processing())
 CLIENT.run(BOT_TOKEN)
