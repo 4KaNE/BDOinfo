@@ -155,10 +155,12 @@ async def del_notification(target_msg):
         count += 1
         try:
             await CLIENT.delete_message(target_msg)
-        except AttributeError:
-            print("通知の削除に失敗 {}回目".format(count))
+            break
 
-        sleep(60)
+        except discord.errors.NotFound:
+            print("通知の削除に失敗　コメントがありません")
+
+        await sleep(60)
 
 CLIENT.loop.create_task(regular_processing())
 CLIENT.run(BOT_TOKEN)
