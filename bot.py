@@ -28,6 +28,7 @@ async def regular_processing():
     while True:
         now = datetime.datetime.now()
         time_key, weekday = CT.check_nextpop(now)
+        weekday = weekday_normalize(weekday)
         nowplay = CT.change_presence(time_key, weekday)
         try:
             await CLIENT.change_presence(game=discord.Game(name=nowplay))
@@ -101,20 +102,8 @@ async def check_reaction(target_msg, weekday):
     """
     指定のメッセージにつけられたリアクションを監視する
     """
-    def weekday_normalize(value):
-        """
-        weekdayの数値を0～6の範囲に直す
-        """
-        if value < 0:
-            value += 7
 
-        elif value > 6:
-            value -= 7
-
-        else:
-            pass
-
-        return value
+    weekday = weekday_normalize(weekday)
 
     endtime = datetime.datetime.now() + datetime.timedelta(seconds=DEL_TIME)
     while True:
@@ -161,6 +150,21 @@ async def del_notification(target_msg):
             print("通知の削除に失敗　コメントがありません")
 
         await sleep(60)
+
+def weekday_normalize(value):
+    """
+    weekdayの数値を0～6の範囲に直す
+    """
+    if value < 0:
+        value += 7
+
+    elif value > 6:
+        value -= 7
+
+    else:
+        pass
+
+    return value
 
 CLIENT.loop.create_task(regular_processing())
 CLIENT.run(BOT_TOKEN)
