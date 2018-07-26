@@ -34,6 +34,8 @@ async def regular_processing():
             await CLIENT.change_presence(game=discord.Game(name=nowplay))
         except AttributeError:
             pass
+        except TimeoutError:
+            pass
 
         res = CT.check_before30(now, time_key, weekday)
         if res is None:
@@ -44,6 +46,8 @@ async def regular_processing():
                 msg = await CLIENT.send_message(CHANNEL, res)
                 CLIENT.loop.create_task(del_notification(msg))
             except AttributeError:
+                pass
+            except TimeoutError:
                 pass
 
         await sleep(60)
@@ -93,6 +97,12 @@ async def on_message(message):
             .format(COMAND_PREFIX), colour=0x3498db)
             msg = await CLIENT.send_message(CHANNEL, embed=res)
             await sleep(DEL_TIME)
+            await CLIENT.delete_message(msg)
+            await CLIENT.delete_message(message)
+
+        elif re.search("refresh", message.content):
+            CLIENT.loop.create_task(regular_processing())
+            msg = await CLIENT.send_message(CHANNEL, "定期処理を再起動しました")
             await CLIENT.delete_message(msg)
             await CLIENT.delete_message(message)
 
